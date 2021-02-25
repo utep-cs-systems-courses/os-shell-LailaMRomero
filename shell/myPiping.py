@@ -1,6 +1,7 @@
 import os
 from myRedirect import redirect
 from Lab1 import executeCommands
+import pipe
 def pipeInput(args):#the pipes method that take output of one method as input of another. eg output | input
     left=args[0:args.index("|")]# gets data of left side of pipe
     right=args[len(left)+1:]#gets the data of right side of pipe
