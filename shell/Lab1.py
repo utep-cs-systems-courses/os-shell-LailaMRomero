@@ -15,14 +15,11 @@ def main():
             
         args = readLine() # We are using the readLine() found in the myReadLine.py
         #args = read(0, 1024)
-        if '|' in args: #check for pipe here so we can split in pipe()
-            pipeInput(args)
-            continue
-        
+       
         if len(args) == 0:
             break # This exits while loop
         
-        args = args.split("\n") 
+        args = args.split("\n")
         
         if not args:
             continue # This goes back to start of while loop
@@ -63,7 +60,10 @@ def inputHandler(args):
             sys.exit(0)
             
 def executeCommand(args):
-    if "/" in args[0]:#if / found in argument then do the following
+    if '|' in args: #check for pipe here so we can split in pipe()
+            pipeInput(args)
+            
+    elif "/" in args[0]:#if / found in argument then do the following
         program=args[0]#puts argument 0 into the value called program
         try:
             os.execve(program,args,os.environ)#execute a process with enviornment in mind
@@ -83,7 +83,7 @@ def executeCommand(args):
 
 def pipeInput(args):#the pipes method that take in arguments
     left=args[0:args.index("|")]# gets data of left side of arguments before |
-    right=args[len(left)+1:]#gets the data of right side of arguments after |
+    right=args[args.index("|")+1:]#gets the data of right side of arguments after |
     pRead, pWrite = os.pipe()#making the read and write 
     rc=os.fork()##creates a child process
     if rc<0:# if the returns a 0 the for failed
