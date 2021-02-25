@@ -41,7 +41,7 @@ def inputHandler(args):
                 return   
             else:
                 os.chdir(args[1])
-        except: # If the directory does not existent
+        except: # If the directory does not exist
             os.write(1, ("cd %s: No such file or directory\n" % args[1]).encode())            
     else:
         rc = os.fork() # The purpose of forking is to create a new process 
@@ -63,39 +63,39 @@ def executeCommand(args):
     if '|' in args: #check for pipe here so we can split in pipe()
             pipeInput(args)
             
-    elif "/" in args[0]:#if / found in argument then do the following
-        program=args[0]#puts argument 0 into the value called program
+    elif "/" in args[0]:
+        program=args[0]
         try:
-            os.execve(program,args,os.environ)#execute a process with enviornment in mind
+            os.execve(program,args,os.environ)#execute a process with enviornment
         except FileNotFoundError:
             pass
-    elif ">" in args or "<" in args:#This is for if there's redirection in the argument
-        redirect(args)#if there is redirection go to redirection with arguments
+    elif ">" in args or "<" in args: #check for redirection
+        redirect(args)
     else:
-        for dir in re.split(":", os.environ['PATH']):#breaks the path apart by ppattern of : in the environment variable path
-            program = "%s/%s" % (dir, args[0])#passes dir into first % to set up the file path then puts the first word in teh argument into the second %
+        for dir in re.split(":", os.environ['PATH']):#breaks the path apart by pattern of : in the environment variable path
+            program = "%s/%s" % (dir, args[0])
             try:
-                os.execve(program, args, os.environ)#tries to execute with given the parameters of program being the path, args being the argumetns and os.environ being the enviornment
+                os.execve(program, args, os.environ)#tries to execute with given the parameters of program as path, args as arguments and os.environ as environment
             except FileNotFoundError:
                 pass
     os.write(2, ("%s: command not found\n" % args[0]).encode())#error code 
     sys.exit(0)
 
-def pipeInput(args):#the pipes method that take in arguments
+def pipeInput(args):#the pipes method thats output of one program as input of another
     left=args[0:args.index("|")]# gets data of left side of arguments before |
     right=args[args.index("|")+1:]#gets the data of right side of arguments after |
-    pRead, pWrite = os.pipe()#making the read and write 
-    rc=os.fork()##creates a child process
-    if rc<0:# if the returns a 0 the for failed
+    pRead, pWrite = os.pipe()#read and write 
+    rc=os.fork()#creates a child 
+    if rc<0:
         os.write(2, ("Fork has failed returning now %d\n" %rc).encode())#
-        sys.exit(1)# used to exit
+        sys.exit(1)
     elif rc==0:#if return value is 0 do the following
         os.close(1)#close file descriptor 1
-        os.dup(pWrite)#copies the file descriptors of the child and puts it into pWrite
+        os.dup(pWrite)#copies the file descriptors of the child into pWrite
         os.set_inheritable(1,True)#
         for fd in (pRead,pWrite):
             os.close(fd)#closes all the file descriptors
-        executeCommand(left)#inputs the left argument into commands
+        executeCommand(left)#inputs the left argument to executeCommands
     else:
         os.close(0)#closes file descriptor 0
         os.dup(pRead)#copies the files descriptor of the parent and puts it into pRead
@@ -103,7 +103,7 @@ def pipeInput(args):#the pipes method that take in arguments
         for fd in (pWrite, pRead):
             os.close(fd)#closes file descriptors in both pRead,pWrite
         if "|" in right:#if it finds '|' on the right side of argument then it's piping it with right's varaibles
-            pipe(right)#goes into pipe with variable pipe
+            pipe(right)#goes into pipe with variable right
         executeCommand(right)#inputs the right argument into commands
 
 if '__main__' == __name__:
